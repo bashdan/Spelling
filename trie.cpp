@@ -1,12 +1,17 @@
 #include <iostream>
+#include <vector>
+#include <algorithm>
+
 #include "trie.hxx"
+#include "spelling.hxx"
 
 int main() {
-    Trie t("dict.txt");
-    t.print();
+    std::vector<std::string> v;
 
-    t.insert("YPSILON");
-    t.insert("ZOOLOGY");
-    t.print();
+    Trie t("dict.txt");
+    v = anagram_wildcards(v, t, "AB**");
+    for (auto w : v) {
+        std::cout << w << "\n";
+    }
     return 0;
 }

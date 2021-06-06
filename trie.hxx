@@ -5,8 +5,8 @@
 #include <cctype> // toupper
 #include <algorithm>
 
-#ifndef TRIE_HXX_
-#define TRIE_HXX_
+#ifndef _TRIE_HXX_
+#define _TRIE_HXX_
 
 #define ALPHA_SIZE 26
 
