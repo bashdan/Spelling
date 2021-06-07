@@ -1,9 +1,9 @@
 CXX = g++
 CXXFLAGS =
-DEPS=trie.hxx spelling.hxx
+DEPS=rules.hxx trie.hxx spelling.hxx
 
-spelling: spelling.cpp trie.cpp $(DEPS)
-	$(CXX) spelling.cpp trie.cpp -o spelling
+spelling: spelling.cpp main.cpp $(DEPS)
+	$(CXX) spelling.cpp main.cpp -o spelling
 
 clean:
 	rm spelling

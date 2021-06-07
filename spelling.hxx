@@ -1,36 +1,53 @@
+#ifndef _SPELLING_HXX_
+#define _SPELLING_HXX_
+
 #include <vector>
 #include <string>
 #include <algorithm>
 #include <tuple>
 
 #include "trie.hxx"
-
-#ifndef _SPELLING_HXX_
-#define _SPELLING_HXX_
-
-#define SBOARD_DIM 15
-
-// SQ_1L = 1* multiplier for character
-// SQ_2L = 2* multiplier for character
-// SQ_3L = 3* multiplier for character
-// SQ_2W = 2* multiplier for placed word
-// SQ_3W = 3* multiplier for placed word
-typedef enum {
-    SQ_1L, SQ_2L, SQ_3L, SQ_2W, SQ_3W
-} square_t;
+#include "rules.hxx"
 
 // The board is a matrix of tuplet_t:
 //      Square type
 //      The character inserted at the position
 //      The value of the character at the position (varies)
-typedef std::tuple<square_t, const char, const std::size_t> tuple_t;
+typedef std::tuple<square_t, char, std::size_t> tuple_t;
 
 class SBoard {
+
+public:
     tuple_t **board;
     SBoard(void) {
         board = new tuple_t*[SBOARD_DIM];
-        for (auto i = 0; i < SBOARD_DIM; i++)
+        for (auto i = 0; i < SBOARD_DIM; i++) {
             board[i] = new tuple_t[SBOARD_DIM];
+        }
+    }
+    SBoard(enum board_layout bl) {
+        switch (bl) {
+            case SCRABBLE:
+                this->board = new tuple_t*[SCRABBLE_DIM];
+                for (auto i = 0; i < SCRABBLE_DIM; i++) {
+                    this->board[i] = new tuple_t[SCRABBLE_DIM];
+                    for (auto j = 0; j < SCRABBLE_DIM; j++) {
+                        this->board[i][j] = 
+                            std::make_tuple(SCRABBLE_LAYOUT[i][j], ' ', 0);
+                    }
+                }
+            break;
+            case WORDS_WITH_FRIENDS:
+                this->board = new tuple_t*[WORDS_WITH_FRIENDS_DIM];
+                for (auto i = 0; i < WORDS_WITH_FRIENDS_DIM; i++) {
+                    this->board[i] = new tuple_t[WORDS_WITH_FRIENDS_DIM];
+                    for (auto j = 0; j < WORDS_WITH_FRIENDS_DIM; j++) {
+                        this->board[i][j] = 
+                            std::make_tuple(WORDS_WITH_FRIENDS_LAYOUT[i][j], ' ', 0);
+                    }
+                }
+            break;
+        }
     }
     ~SBoard(void) {
         for (auto i = 0; i < SBOARD_DIM; i++)
@@ -44,13 +61,21 @@ class SBoard {
         for (auto y = 0; y < SBOARD_DIM; y++) {
             for (auto x = 0; x < SBOARD_DIM; x++) {
                 std::cout << "|";
-                /* TODO
-                switch (this->board[y][x]) {
-                    case SQ_1L: std::wcout << 0xB9
+                if (y == 7 && x == 7) { // center special case
+                    std::cout << "\u00A4";
                 }
-                */
+                else {
+                    switch (std::get<0>(this->board[y][x])) {
+                        case SQ_1L: std::cout << ' '; break;
+                        case SQ_2L: std::cout << "\u00B2"; break;
+                        case SQ_3L: std::cout << "\u00B3"; break;
+                        case SQ_2W: std::cout << '2'; break;
+                        case SQ_3W: std::cout << '3'; break;
+                    }
+                }
+                std::cout << std::get<1>(this->board[y][x]) << " ";
             }
-            std::cout << BORDER << "\n";
+            std::cout << "|\n" << BORDER << "\n";
         }
     }
 };
