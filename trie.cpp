@@ -7,9 +7,9 @@
 
 int main() {
     std::vector<std::string> v;
-
-    Trie t("dict.txt");
-    v = anagram_wildcards(v, t, "AB**");
+    
+    Trie t("TWL3.txt");
+    v = anagram_wildcards(v, t, "ZYZZYX");
     for (auto w : v) {
         std::cout << w << "\n";
     }

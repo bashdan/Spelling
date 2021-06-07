@@ -1,5 +1,40 @@
+#include <sstream>
+#include <fstream>
+
 #include "spelling.hxx"
 #include "trie.hxx"
+
+void transform_file(const std::string &filename_in, const std::string &filename_out) {
+    
+    std::ifstream fin(filename_in);
+    if (!fin.is_open()) {
+        std::cerr << "Error: couldn't open " << filename_in << std::endl;
+        exit(1);
+    }
+    std::ofstream fout(filename_out);
+    if (!fout.is_open()) {
+        std::cerr << "Error: couldn't open " << filename_out << std::endl;
+        fin.close();
+        exit(1);
+    }
+    auto cond_toupper = [](char c) {
+        return (c >= 'a' && c <= 'z') ? char(c+('A'-'a')) : c;
+    };
+
+    std::string t;
+    while (getline(fin, t)) {
+        std::stringstream ss(t);
+        std::string newstr;
+        while (ss >> newstr) {
+            std::transform(newstr.begin(), newstr.end(), newstr.begin(), cond_toupper);
+            newstr.append("\n");
+            fout << newstr;
+        }
+    }
+    fin.close();
+    fout.close();
+}
+
 
 std::vector<std::string> &permutate(std::vector<std::string> &v, const std::string s) {
 
