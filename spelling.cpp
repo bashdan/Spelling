@@ -118,7 +118,6 @@ std::vector<std::string> &anagram_wildcards(std::vector<std::string> &v, Trie &t
 std::vector<std::string> &anagram_exhaustively(std::vector<std::string> &v, Trie &t, const std::string &s) {
 
     auto string_powerset = [](std::vector<std::string> &xs, const std::string &cs) {
-        std::vector<std::string> out;
         std::size_t len = cs.length();
         auto pow = [](unsigned b, unsigned x) {
             auto c = b;
