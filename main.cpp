@@ -2,9 +2,6 @@
 #include <vector>
 #include <algorithm>
 
-#define COLLINS "./dictionaries/Collins Scrabble Words (2019).txt"
-#define TWL3    "./dictionaries/TWL3.txt"
-
 #include "trie.hxx"
 #include "spelling.hxx"
 
@@ -13,8 +10,15 @@ int main() {
     
     Trie t(COLLINS);
 
-    SBoard b(SCRABBLE);
-    b.prettyprint();
+    v = anagram_exhaustively(v, t, "DANIEL");
+    for (auto e : v) {
+        std::cout << e << "\n";
+    }
+
+    benchmark("DANIEL");
+    SBoard board(SCRABBLE);
+    board.prettyprint();
+
     
     return 0;
 }

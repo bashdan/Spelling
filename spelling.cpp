@@ -2,6 +2,7 @@
 #include <fstream>
 #include <set>
 #include <vector>
+#include <list>
 
 #include "spelling.hxx"
 #include "trie.hxx"
@@ -67,12 +68,7 @@ std::vector<std::string> &anagram_wildcards(std::vector<std::string> &v, Trie &t
 
     static const std::string ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     static const std::string WILDCARDS = "*%?";
-    auto contains_wildcards = [](const std::string& str) {
-        for (auto c : str)
-            for (auto w : WILDCARDS)
-                if (c == w) return true;
-        return false;
-    };
+    
     // First, replace all the wildcards
     v.push_back(s);
     bool reduced;
@@ -115,35 +111,47 @@ std::vector<std::string> &anagram_wildcards(std::vector<std::string> &v, Trie &t
     return v;
 }
 
+void string_powerset(std::list<std::string> &out, const std::string &str) {
+
+    const std::size_t len = str.length();
+    for (auto i = 0; i < (2 << len); i++) {
+        std::string temp = "";
+        for (auto b = 0; b < len; b++)
+            if (i & (1 << b)) temp += str.at(b);
+        out.push_back(temp);
+    }
+}
+
 std::vector<std::string> &anagram_exhaustively(std::vector<std::string> &v, Trie &t, const std::string &s) {
 
-    auto string_powerset = [](std::vector<std::string> &xs, const std::string &cs) {
-        std::size_t len = cs.length();
-        auto pow = [](unsigned b, unsigned x) {
-            auto c = b;
-            while (x--) b *= c;
-            return b;
-        };
-        std::size_t ps_size = pow(2, len);
-        for (auto i = 0; i < ps_size; i++) {
-            std::string word = "";
-            for (auto bit = 0; bit < len; bit++) {
-                if (i & (1 << bit))
-                    word += cs.at(bit);
-            }
-            xs.push_back(word);
-        }
-        // filter out the empty set and 1-char entries
-        for (auto i = 0; i < xs.size();) {
-            if (xs.at(i).length() > 1) i++;
-            else xs.erase(xs.begin()+i);
-        }
-        return xs;
-    };
-    std::vector<std::string> str_ps;
-    str_ps = string_powerset(str_ps, s);
+    std::list<std::string> str_ps;
+    string_powerset(str_ps, s);
+    // remove entries that are too short
+    for (auto it = str_ps.begin(); it != str_ps.end();) {
+        if ((*it).size() > 1) it++;
+        else it = str_ps.erase(it); // list erasure is faster than vector erasure
+    }
+
     for (auto new_s : str_ps) {
         v = anagram_wildcards(v, t, new_s);
     }
+
     return v;
+}
+
+void benchmark(const std::string &str) {
+
+    std::vector<std::string> v;
+    auto start = std::chrono::steady_clock::now();
+    Trie twl(TWL3);
+    Trie collins(COLLINS);
+
+    v = anagram_exhaustively(v, twl, str);
+    v.clear();
+    v = anagram_exhaustively(v, collins, str);
+
+    auto stop = std::chrono::steady_clock::now();
+
+    std::cout << "Benchmark time: " 
+        << std::chrono::duration<double>(stop-start).count() << " s" << std::endl;
 }
